@@ -22,7 +22,7 @@ class MainMenu extends React.Component {
           : ''
         }
         <Link to="/levels" className="block px-4 py-2 mb-2 bg-red-500 text-center">Play</Link>
-        <div onClick={window.close()} className="block px-4 py-2 mb-2 bg-gray-200 text-center">Exit</div>
+        <div onClick={window.close} className="block px-4 py-2 mb-2 bg-gray-200 text-center">Exit</div>
       </div>;
     }
   }
