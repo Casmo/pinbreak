@@ -705,7 +705,7 @@ module.exports = {
     rotate: ['responsive', 'hover', 'focus'],
     translate: ['responsive', 'hover', 'focus'],
     skew: ['responsive', 'hover', 'focus'],
-    transitionProperty: ['responsive'],
+    transitionProperty: ['responsive', 'hover'],
     transitionTimingFunction: ['responsive'],
     transitionDuration: ['responsive'],
     transitionDelay: ['responsive'],

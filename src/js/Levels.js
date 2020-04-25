@@ -9,9 +9,11 @@ class Levels extends React.Component {
       this.state = {
         levels: [
           {
+            level: 1,
             name: 'Introduction'
           },
           {
+            level: 2,
             name: 'Ready to Rock'
           }
         ]
@@ -23,10 +25,14 @@ class Levels extends React.Component {
   
     render() {
       return <div>
-        <Link to="/">Menu</Link>
-        <div className="flex flex-wrap">
+        <Link to="/" className="fixed left-0 top-0 m-4">Menu</Link>
+        <div className="flex items-center justify-center h-screen">
         {this.state.levels.map((level, index) =>
-          <div key={index} className="text-gray-700 text-center bg-gray-400 px-4 py-2 m-2 w-1/3">{level.name}</div>
+          <Link to={{
+            pathname: '/level/' + level.level
+          }} key={index} className="text-gray-700 text-center bg-gray-400 px-4 py-2 m-2 w-1/3">
+            {level.name}
+          </Link>
         )}
         </div>
       </div>;

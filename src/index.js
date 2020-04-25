@@ -7,20 +7,22 @@ import {
 } from "react-router-dom";
 
 import { render } from 'react-dom';
-import Page from './js/Page';
+import MainMenu from './js/MainMenu';
 import Levels from './js/Levels';
+import Level from './js/Level';
 import './styles/index.scss';
 
 const App = () => (
   <Router>
-    <Switch>
-      <Route path="/levels">
-        <Levels />
-      </Route>
-      <Route path="/">
-        <Page />
-      </Route>
-    </Switch>
+      <Switch>
+        <Route path="/levels">
+          <Levels />
+        </Route>
+        <Route path="/level/:level" component={Level}/>
+        <Route path="/">
+          <MainMenu />
+        </Route>
+      </Switch>
   </Router>
 );
 
