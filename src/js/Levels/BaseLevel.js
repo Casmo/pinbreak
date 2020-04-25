@@ -85,7 +85,8 @@ class BaseLevel extends React.Component {
           height: this.game.settings.height,
           wireframes: false,
           showAngleIndicator: false,
-          background: 'rgb(10,0,0)'
+          background: 'rgb(10,0,0)',
+          showSleeping: false
         }
       });
       
