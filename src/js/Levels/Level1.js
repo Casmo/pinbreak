@@ -4,12 +4,15 @@ import BaseLevel from './BaseLevel';
 
 class Level1 extends BaseLevel {
 
-    render() {
-      return <div>
-        <div className="flex items-center justify-center h-screen w-screen" ref="scene">
-          <canvas ref="canvas" className="object-contain w-auto h-auto max-h-screen max-w-screen" />
-        </div>
-      </div>;
+    start() {
+      
+      // var wallRight = Matter.Bodies.rectangle(this.game.settings.width-100, this.game.settings.height / 2, 80, this.game.settings.height, {
+      //   isStatic: true,
+      //   render: {
+      //     visible: true
+      //   }
+      // });
+      // Matter.World.add(this.game.engine.world, wallRight);
     }
   }
   export default Level1;

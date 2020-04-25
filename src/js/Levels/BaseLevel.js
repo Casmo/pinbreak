@@ -15,12 +15,31 @@ class BaseLevel extends React.Component {
        * Setting for the rock that will be throwned by the player
        */
       rock: {
-        density: .01,
-        restitution: 1
+        density: 0.1,
+        restitution: .8,
+        collisionFilter: {
+            category: 0x0002
+        },
+        render: {
+            fillStyle: '#ffffff'
+        }
+      },
+      rock2: {
+        density: 0.1,
+        restitution: .8,
+        render: {
+            fillStyle: '#ffffff'
+        }
+      },
+      goal: {
+          position: {
+              x: 900,
+              y: 1280
+          }
       },
       player: {
         position: {
-          x: 1080 / 2,
+          x: 200,
           y: 1920 - 400
         }
       }
@@ -32,7 +51,13 @@ class BaseLevel extends React.Component {
     rock: null,
     mouse: null,
     mouseConstraint: null,
-    elastic: null
+    elastic: null,
+    goal: {
+        goal: null,
+        bucketSideLeft: null,
+        bucketSideRight: null,
+        bucketFloor: null
+    }
   }
 
     constructor(props) {
@@ -47,6 +72,7 @@ class BaseLevel extends React.Component {
   
       this.game.engine = Matter.Engine.create({
         // positionIterations: 20
+        enableSleeping: true
       });
 
 
@@ -92,8 +118,6 @@ class BaseLevel extends React.Component {
       Matter.World.add(this.game.engine.world, floor);
       Matter.World.add(this.game.engine.world, wallLeft);
       Matter.World.add(this.game.engine.world, wallRight);
-
-      this.addPlayer();
       
       // Matter.Engine.run(this.game.engine);
       Matter.Render.run(this.game.render);
@@ -101,19 +125,56 @@ class BaseLevel extends React.Component {
       // create runner
       var runner = Matter.Runner.create();
       Matter.Runner.run(runner, this.game.engine);
+
+      let settings = {
+          isStatic: true,
+      };
+        this.game.goal.bucketFloor = Matter.Bodies.rectangle(
+            this.game.settings.goal.position.x,
+            this.game.settings.goal.position.y,
+            250,
+            20,
+            settings
+        );
+        this.game.goal.bucketSideLeft = Matter.Bodies.rectangle(
+            this.game.settings.goal.position.x - 135,
+            this.game.settings.goal.position.y - 90,
+            20,
+            200,
+            settings
+        );
+        this.game.goal.bucketSideRight = Matter.Bodies.rectangle(
+            this.game.settings.goal.position.x + 135,
+            this.game.settings.goal.position.y - 90,
+            20,
+            200,
+            settings
+        );
+        this.game.goal.goal = Matter.Composite.create({
+            bodies: [this.game.goal.bucketFloor, this.game.goal.bucketSideLeft, this.game.goal.bucketSideRight]
+        });
+
+        Matter.World.add(this.game.engine.world, this.game.goal.goal);
     }
 
     /**
      * Create a player (position and the rock settings)
      */
     addPlayer() {
-      this.game.rock = Matter.Bodies.polygon(
+      this.game.rock = Matter.Bodies.circle(
         this.game.settings.player.position.x,
         this.game.settings.player.position.y,
-        8,
-        20,
+        40,
         this.game.settings.rock
       );
+      
+      Matter.Events.on(this.game.rock, 'sleepStart', (event) => {
+          console.log(event);
+        if (Matter.Bounds.overlaps(event.source.bounds, this.game.goal.bucketFloor.bounds)) {
+            event.source.render.fillStyle = 'rgba(0,0,255)';
+        }
+      });
+
       this.game.elastic = Matter.Constraint.create({ 
           pointA: this.game.settings.player.position, 
           bodyB: this.game.rock, 
@@ -127,9 +188,12 @@ class BaseLevel extends React.Component {
       // add mouse control
       this.game.mouse = Matter.Mouse.create(this.game.render.canvas);
       this.game.mouseConstraint = Matter.MouseConstraint.create(this.game.engine, {
+            collisionFilter: {
+                mask: 0x0002
+            },
           mouse: this.game.mouse,
           constraint: {
-              stiffness: 0.2,
+              stiffness: 0.1,
               render: {
                   visible: true
               }
@@ -146,15 +210,21 @@ class BaseLevel extends React.Component {
           if (this.game.mouseConstraint.mouse.button === -1 && (
             this.game.rock.position.y < (this.game.settings.player.position.y-20))
             ) {
-              this.game.rock = Matter.Bodies.polygon(
+                this.game.rock.collisionFilter.category = 0x001;
+                // Remove group from previous (the shooting) rock
+              this.game.rock = Matter.Bodies.circle(
                 this.game.settings.player.position.x,
                 this.game.settings.player.position.y,
-                7,
-                20,
+                40,
                 this.game.settings.rock
               );
               Matter.World.add(this.game.engine.world, this.game.rock);
               this.game.elastic.bodyB = this.game.rock;
+                Matter.Events.on(this.game.rock, 'sleepStart', (event) => {
+                    if (Matter.Bounds.overlaps(event.source.bounds, this.game.goal.bucketFloor.bounds)) {
+                        event.source.render.fillStyle = 'rgba(0,0,255)';
+                    }
+                });
           }
       });
 
@@ -171,6 +241,11 @@ class BaseLevel extends React.Component {
   
     componentDidMount() {
       this.initWorld();
+      this.addPlayer();
+      this.start();
+    }
+
+    start() {
     }
   
     render() {
