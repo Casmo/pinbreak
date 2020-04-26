@@ -31,12 +31,6 @@ class BaseLevel extends React.Component {
             fillStyle: '#ffffff'
         }
       },
-      goal: {
-          position: {
-              x: 900,
-              y: 1280
-          }
-      },
       player: {
         position: {
           x: 200,
@@ -52,12 +46,25 @@ class BaseLevel extends React.Component {
     mouse: null,
     mouseConstraint: null,
     elastic: null,
-    goal: {
-        goal: null,
-        bucketSideLeft: null,
-        bucketSideRight: null,
-        bucketFloor: null
-    }
+    /**
+     * List with all objects to hit
+     */
+    goals: [
+      {
+        object: null,
+        position: {
+          x: 1080/2,
+          y: 500
+        },
+        options: {
+          isStatic: false,
+          gravityScale: 0,
+          render: {
+            fillStyle: 'red'
+          }
+        }
+      }
+    ]
   }
 
     constructor(props) {
@@ -127,35 +134,56 @@ class BaseLevel extends React.Component {
       var runner = Matter.Runner.create();
       Matter.Runner.run(runner, this.game.engine);
 
-      let settings = {
-          isStatic: true,
-      };
-        this.game.goal.bucketFloor = Matter.Bodies.rectangle(
-            this.game.settings.goal.position.x,
-            this.game.settings.goal.position.y,
-            250,
-            20,
-            settings
+      this.game.goals.map((goal, key) => {
+        this.game.goals[key].object = Matter.Bodies.circle(
+          goal.position.x,
+          goal.position.y,
+          40,
+          goal.options
         );
-        this.game.goal.bucketSideLeft = Matter.Bodies.rectangle(
-            this.game.settings.goal.position.x - 135,
-            this.game.settings.goal.position.y - 90,
-            20,
-            200,
-            settings
-        );
-        this.game.goal.bucketSideRight = Matter.Bodies.rectangle(
-            this.game.settings.goal.position.x + 135,
-            this.game.settings.goal.position.y - 90,
-            20,
-            200,
-            settings
-        );
-        this.game.goal.goal = Matter.Composite.create({
-            bodies: [this.game.goal.bucketFloor, this.game.goal.bucketSideLeft, this.game.goal.bucketSideRight]
+      
+        Matter.Events.on(this.game.goals[key].object, 'sleepStart', (event) => {
+          // Check endgame conditions
+          this.checkEndGameConditions();
         });
+        
+        Matter.World.add(this.game.engine.world, this.game.goals[key].object);
+      });
 
-        Matter.World.add(this.game.engine.world, this.game.goal.goal);
+      Matter.Events.on(this.game.engine, 'collisionStart', (event) => {
+        var pairs = event.pairs;
+
+        // change object colours to show those in an active collision (e.g. resting contact)
+        for (var i = 0; i < pairs.length; i++) {
+            var pair = pairs[i];
+            if (pair.bodyA._type == 'player' || pair.bodyB._type == 'player') {
+              // Player always overrides the colors
+              pair.bodyA.render.fillStyle = '#ffffff';
+              pair.bodyB.render.fillStyle = '#ffffff';
+              pair.bodyA._complete = true;
+              pair.bodyB._complete = true;
+            }
+            else {
+
+            }
+        }
+      });
+    }
+
+    /**
+     * Loop through goals and check if all goals are sleeping and hitted by the player.
+     * If true, winner and next game
+     */
+    checkEndGameConditions() {
+      console.log('check for winning conditions');
+      let win = true;
+      this.game.goals.map((goal, index) => {
+        console.log(goal);
+        if (goal.object._complete != true) {
+          win = false;
+        }
+      });
+      console.log('Did you win?', win);
     }
 
     /**
@@ -168,13 +196,7 @@ class BaseLevel extends React.Component {
         40,
         this.game.settings.rock
       );
-      
-      Matter.Events.on(this.game.rock, 'sleepStart', (event) => {
-          console.log(event);
-        if (Matter.Bounds.overlaps(event.source.bounds, this.game.goal.bucketFloor.bounds)) {
-            event.source.render.fillStyle = 'rgba(0,0,255)';
-        }
-      });
+      this.game.rock._type = 'player';
 
       this.game.elastic = Matter.Constraint.create({ 
           pointA: this.game.settings.player.position, 
@@ -219,13 +241,9 @@ class BaseLevel extends React.Component {
                 40,
                 this.game.settings.rock
               );
+              this.game.rock._type = 'player';
               Matter.World.add(this.game.engine.world, this.game.rock);
               this.game.elastic.bodyB = this.game.rock;
-                Matter.Events.on(this.game.rock, 'sleepStart', (event) => {
-                    if (Matter.Bounds.overlaps(event.source.bounds, this.game.goal.bucketFloor.bounds)) {
-                        event.source.render.fillStyle = 'rgba(0,0,255)';
-                    }
-                });
           }
       });
 
