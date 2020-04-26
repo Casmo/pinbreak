@@ -4,6 +4,7 @@ import {
 } from "react-router-dom";
 
 import Level1 from "./Levels/Level1";
+import Level2 from "./Levels/Level2";
 
 class Level extends React.Component {
 
@@ -14,6 +15,7 @@ class Level extends React.Component {
         currentLevel: props.match.params.level
       };
       this.refresh = this.refresh.bind(this);
+      this.nextLevel = this.nextLevel.bind(this);
     }
 
     componentDidMount() {
@@ -32,11 +34,20 @@ class Level extends React.Component {
         });
       }, 1);
     }
+
+    nextLevel() {
+      this.setState({
+        currentLevel: (this.state.currentLevel + 1)
+      });
+    }
   
     render() {
       let level;
       if (this.state.currentLevel == 1) {
-        level = <Level1 />;
+        level = <Level1 nextLevel = {this.nextLevel} />;
+      }
+      if (this.state.currentLevel == 2) {
+        level = <Level2 nextLevel = {this.nextLevel} />;
       }
       return <div>
         <div className="fixed left-0 top-0 m-4">

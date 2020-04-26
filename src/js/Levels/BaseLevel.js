@@ -1,5 +1,8 @@
 import React from 'react';
 import Matter from "matter-js";
+import {
+  Link
+} from "react-router-dom";
 
 class BaseLevel extends React.Component {
 
@@ -7,10 +10,17 @@ class BaseLevel extends React.Component {
    * Matter JS game objects
    */
   game = {
+    level: 1,
     settings: {
-      numberOfTried: 5,
+      numberOfTries: 5,
       width: 1080,
       height: 1920,
+      world: {
+        gravity: {
+          x: 0,
+          y: 0
+        }
+      },
       /**
        * Setting for the rock that will be throwned by the player
        */
@@ -20,13 +30,6 @@ class BaseLevel extends React.Component {
         collisionFilter: {
             category: 0x0002
         },
-        render: {
-            fillStyle: '#ffffff'
-        }
-      },
-      rock2: {
-        density: 0.1,
-        restitution: .8,
         render: {
             fillStyle: '#ffffff'
         }
@@ -57,8 +60,10 @@ class BaseLevel extends React.Component {
           y: 500
         },
         options: {
+          density: 0.1,
+          restitution: .8,
           isStatic: false,
-          gravityScale: 0,
+          // frictionAir: 1,
           render: {
             fillStyle: 'red'
           }
@@ -69,7 +74,9 @@ class BaseLevel extends React.Component {
 
     constructor(props) {
       super(props);
-      this.state = {};
+      this.state = {
+        win: false
+      };
     }
 
     /**
@@ -79,7 +86,10 @@ class BaseLevel extends React.Component {
   
       this.game.engine = Matter.Engine.create({
         // positionIterations: 20
-        enableSleeping: true
+        enableSleeping: true,
+        world: Matter.World.create(
+          this.game.settings.world
+        )
       });
 
 
@@ -134,6 +144,7 @@ class BaseLevel extends React.Component {
       var runner = Matter.Runner.create();
       Matter.Runner.run(runner, this.game.engine);
 
+      // Create objectives
       this.game.goals.map((goal, key) => {
         this.game.goals[key].object = Matter.Bodies.circle(
           goal.position.x,
@@ -163,8 +174,11 @@ class BaseLevel extends React.Component {
               pair.bodyA._complete = true;
               pair.bodyB._complete = true;
             }
-            else {
-
+            else if (pair.bodyA._complete == false || pair.bodyA._completed == false) {
+              pair.bodyA.render.fillStyle = 'red';
+              pair.bodyB.render.fillStyle = 'red';
+              pair.bodyA._complete = false;
+              pair.bodyB._complete = false;
             }
         }
       });
@@ -175,7 +189,6 @@ class BaseLevel extends React.Component {
      * If true, winner and next game
      */
     checkEndGameConditions() {
-      console.log('check for winning conditions');
       let win = true;
       this.game.goals.map((goal, index) => {
         console.log(goal);
@@ -183,7 +196,9 @@ class BaseLevel extends React.Component {
           win = false;
         }
       });
-      console.log('Did you win?', win);
+      this.setState({
+        win: win
+      });
     }
 
     /**
@@ -264,11 +279,29 @@ class BaseLevel extends React.Component {
       this.start();
     }
 
+    nextLevel() {
+
+    }
+
     start() {
     }
   
     render() {
+      let winningMessage;
+      if (this.state.win) {
+        winningMessage = <div className="fixed bottom-0 inset-x-0 pb-2">
+          <div className="max-auto px-2">
+            <div className="bg-indigo-500 text-white font-medium px-2 py-2 text-center">
+              You won!
+              <span onClick = {this.props.nextLevel} className="pl-2 text-white">
+                Next level
+              </span>
+            </div>
+          </div>
+        </div>;
+      }
       return <div>
+        {winningMessage}
         <div className="flex items-center justify-center h-screen w-screen" ref="scene">
           <canvas ref="canvas" className="object-contain w-auto h-auto max-h-screen max-w-screen" />
         </div>
