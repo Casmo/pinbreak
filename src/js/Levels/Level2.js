@@ -4,15 +4,42 @@ import BaseLevel from './BaseLevel';
 
 class Level2 extends BaseLevel {
 
-    start() {
-      
-      // var wallRight = Matter.Bodies.rectangle(this.game.settings.width-100, this.game.settings.height / 2, 80, this.game.settings.height, {
-      //   isStatic: true,
-      //   render: {
-      //     visible: true
-      //   }
-      // });
-      // Matter.World.add(this.game.engine.world, wallRight);
+  game = {
+    goals: [
+    {
+      object: null,
+      position: {
+        x: 1080/2,
+        y: 500
+      },
+      options: {
+        density: 0.1,
+        restitution: .8,
+        isStatic: false,
+        // frictionAir: 1,
+        render: {
+          fillStyle: 'red'
+        }
+      }
+    },
+    {
+      object: null,
+      position: {
+        x: 1080/2,
+        y: 300
+      },
+      options: {
+        density: 0.1,
+        restitution: .8,
+        isStatic: false,
+        // frictionAir: 1,
+        render: {
+          fillStyle: 'red'
+        }
+      }
     }
+  ]
+    }
+
   }
   export default Level2;

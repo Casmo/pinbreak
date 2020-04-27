@@ -9,7 +9,9 @@ class BaseLevel extends React.Component {
   /**
    * Matter JS game objects
    */
-  game = {
+  game = {};
+
+  defaultGame = {
     level: 1,
     settings: {
       numberOfTries: 5,
@@ -36,7 +38,7 @@ class BaseLevel extends React.Component {
       },
       player: {
         position: {
-          x: 200,
+          x: 1080/2,
           y: 1920 - 400
         }
       }
@@ -57,7 +59,7 @@ class BaseLevel extends React.Component {
         object: null,
         position: {
           x: 1080/2,
-          y: 500
+          y: 400
         },
         options: {
           density: 0.1,
@@ -75,8 +77,16 @@ class BaseLevel extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        win: false
+        win: false,
+        numberOfTries: 0
       };
+    }
+
+    init() {
+      this.game = Object.assign(this.defaultGame, this.game);
+      this.setState({
+        numberOfTries: this.game.settings.numberOfTries
+      });
     }
 
     /**
@@ -174,12 +184,13 @@ class BaseLevel extends React.Component {
               pair.bodyA._complete = true;
               pair.bodyB._complete = true;
             }
-            else if (pair.bodyA._complete == false || pair.bodyA._completed == false) {
-              pair.bodyA.render.fillStyle = 'red';
-              pair.bodyB.render.fillStyle = 'red';
-              pair.bodyA._complete = false;
-              pair.bodyB._complete = false;
+            else if (pair.bodyA._complete == true || pair.bodyB._completed == true) {
+              pair.bodyA.render.fillStyle = '#ffffff';
+              pair.bodyB.render.fillStyle = '#ffffff';
+              pair.bodyA._complete = true;
+              pair.bodyB._complete = true;
             }
+            // if blue && white ? then blue
         }
       });
     }
@@ -187,12 +198,12 @@ class BaseLevel extends React.Component {
     /**
      * Loop through goals and check if all goals are sleeping and hitted by the player.
      * If true, winner and next game
+     * All goals should be sleeping
      */
     checkEndGameConditions() {
       let win = true;
       this.game.goals.map((goal, index) => {
-        console.log(goal);
-        if (goal.object._complete != true) {
+        if (goal.object._complete != true || goal.object.isSleeping == false) {
           win = false;
         }
       });
@@ -248,17 +259,22 @@ class BaseLevel extends React.Component {
           if (this.game.mouseConstraint.mouse.button === -1 && (
             this.game.rock.position.y < (this.game.settings.player.position.y-20))
             ) {
-                this.game.rock.collisionFilter.category = 0x001;
-                // Remove group from previous (the shooting) rock
-              this.game.rock = Matter.Bodies.circle(
-                this.game.settings.player.position.x,
-                this.game.settings.player.position.y,
-                40,
-                this.game.settings.rock
-              );
-              this.game.rock._type = 'player';
-              Matter.World.add(this.game.engine.world, this.game.rock);
-              this.game.elastic.bodyB = this.game.rock;
+              this.game.settings.numberOfTries--;
+              this.game.rock.collisionFilter.category = 0x001;
+
+              if (this.game.settings.numberOfTries > 0) {
+                  // Remove group from previous (the shooting) rock
+                this.game.rock = Matter.Bodies.circle(
+                  this.game.settings.player.position.x,
+                  this.game.settings.player.position.y,
+                  40,
+                  this.game.settings.rock
+                );
+                this.game.rock._type = 'player';
+                Matter.World.add(this.game.engine.world, this.game.rock);
+                this.game.elastic.bodyB = this.game.rock;
+              }
+
           }
       });
 
@@ -274,13 +290,10 @@ class BaseLevel extends React.Component {
     }
   
     componentDidMount() {
+      this.init();
       this.initWorld();
       this.addPlayer();
       this.start();
-    }
-
-    nextLevel() {
-
     }
 
     start() {
@@ -293,7 +306,7 @@ class BaseLevel extends React.Component {
           <div className="max-auto px-2">
             <div className="bg-indigo-500 text-white font-medium px-2 py-2 text-center">
               You won!
-              <span onClick = {this.props.nextLevel} className="pl-2 text-white">
+              <span onClick = {this.props.nextLevel} className="cursor-pointer pl-2 text-white">
                 Next level
               </span>
             </div>
