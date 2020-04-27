@@ -13,8 +13,8 @@ class BaseLevel extends React.Component {
 
   defaultGame = {
     level: 1,
+    numberOfTries: 5,
     settings: {
-      numberOfTries: 5,
       width: 1080,
       height: 1920,
       world: {
@@ -27,6 +27,7 @@ class BaseLevel extends React.Component {
        * Setting for the rock that will be throwned by the player
        */
       rock: {
+        restitution: 1,
         collisionFilter: {
             category: 0x0002
         },
@@ -83,7 +84,7 @@ class BaseLevel extends React.Component {
     init() {
       this.game = Object.assign(this.defaultGame, this.game);
       this.setState({
-        numberOfTries: this.game.settings.numberOfTries
+        numberOfTries: this.game.numberOfTries
       });
     }
 
@@ -162,13 +163,14 @@ class BaseLevel extends React.Component {
 
       // Create objectives
       this.game.goals.map((goal, key) => {
+        let options = Object.assign({restitution: 1}, goal.options);
         if (goal.type == 'rectangle') {
           this.game.goals[key].object = Matter.Bodies.rectangle(
             goal.position.x,
             goal.position.y,
             goal.width,
             goal.height,
-            goal.options
+            options
           );
         }
         else {
@@ -176,7 +178,7 @@ class BaseLevel extends React.Component {
             goal.position.x,
             goal.position.y,
             40,
-            goal.options
+            options
           );
         }
         this.game.goals[key].object._type = 'goals';
@@ -208,12 +210,14 @@ class BaseLevel extends React.Component {
             }
             else if (pair.bodyA._overRule == true || pair.bodyB._overRule == true) {
               if (pair.bodyA._overRule == true) {
+                pair.bodyB._overRule = true;
                 pair.bodyB.render.fillStyle = pair.bodyA.render.fillStyle;
                 pair.bodyB._complete = false;
               }
               else {
                 pair.bodyA.render.fillStyle = pair.bodyB.render.fillStyle;
                 pair.bodyA._complete = false;
+                pair.bodyA._overRule = true;
               }
             }
             else if (pair.bodyA._complete == true || pair.bodyB._completed == true) {
@@ -222,7 +226,6 @@ class BaseLevel extends React.Component {
               pair.bodyA._complete = true;
               pair.bodyB._complete = true;
             }
-            // if blue && white ? then blue
         }
       });
     }
@@ -265,7 +268,6 @@ class BaseLevel extends React.Component {
         this.game.rock, this.game.elastic
       ]);
 
-
       // add mouse control
       this.game.mouse = Matter.Mouse.create(this.game.render.canvas);
       this.game.mouseConstraint = Matter.MouseConstraint.create(this.game.engine, {
@@ -291,10 +293,23 @@ class BaseLevel extends React.Component {
           if (this.game.mouseConstraint.mouse.button === -1 && (
             this.game.rock.position.y < (this.game.settings.player.position.y-20))
             ) {
-              this.game.settings.numberOfTries--;
+              let numberOfTries = this.state.numberOfTries;
+              numberOfTries--;
+              this.setState({
+                numberOfTries: numberOfTries
+              });
               this.game.rock.collisionFilter.category = 0x001;
 
-              if (this.game.settings.numberOfTries > 0) {
+
+
+              Matter.Events.on(this.game.rock, 'sleepStart', (event) => {
+                // When a rock ends, it becomes a goal
+                event.source._type = 'goal';
+                event.source.render.lineWidth = 0;
+                event.source._complete = true;
+              });
+              
+              if (numberOfTries > 0) {
                   // Remove group from previous (the shooting) rock
                 this.game.rock = Matter.Bodies.circle(
                   this.game.settings.player.position.x,
@@ -349,6 +364,7 @@ class BaseLevel extends React.Component {
         {winningMessage}
         <div className="flex items-center justify-center h-screen w-screen" ref="scene">
           <canvas ref="canvas" className="object-contain w-auto h-auto max-h-screen max-w-screen" />
+          <div className="text-white absolute top-0">Shots left: {this.state.numberOfTries}</div>
         </div>
       </div>;
     }
