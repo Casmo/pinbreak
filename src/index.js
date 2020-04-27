@@ -8,16 +8,12 @@ import {
 
 import { render } from 'react-dom';
 import MainMenu from './js/MainMenu';
-import Levels from './js/Levels';
 import Level from './js/Level';
 import './styles/index.scss';
 
 const App = () => (
   <Router>
       <Switch>
-        <Route path="/levels">
-          <Levels />
-        </Route>
         <Route path="/level/:level" component={Level}/>
         <Route path="/">
           <MainMenu />

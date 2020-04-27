@@ -7,8 +7,15 @@ import {
 class MainMenu extends React.Component {
     constructor(props) {
       super(props);
+      let currentLevel = 1;
+      if (localStorage.getItem('currentLevel')) {
+        currentLevel = parseInt(localStorage.getItem('currentLevel'));
+      }
+      if (currentLevel <= 0) {
+        currentLevel = 0;
+      }
       this.state = {
-        currentLevel: 1
+        currentLevel: currentLevel
       };
     }
   
@@ -16,13 +23,20 @@ class MainMenu extends React.Component {
     }
   
     render() {
-      return <div className="">
+      return <div className="flex content-center flex-wrap h-screen">
+        <div className="container mx-auto">
+          
         {this.state.currentLevel > 1 ?
-          <Link to="/levels" className="block px-4 py-2 mb-2 bg-red-500 text-center">Continue</Link>
+          <Link to={{
+            pathname: '/level/' + this.state.currentLevel
+          }} className="block px-4 py-2 mb-2 bg-red-500 text-center">
+            Continue
+          </Link>
           : ''
         }
-        <Link to="/levels" className="block px-4 py-2 mb-2 bg-red-500 text-center">Play</Link>
-        <div onClick={window.close} className="block px-4 py-2 mb-2 bg-gray-200 text-center">Exit</div>
+        <Link to="/level/1" className="block px-4 py-2 mb-2 bg-white text-center">Play</Link>
+        <div onClick={window.close} className="cursor-pointer block px-4 py-2 mb-2 bg-gray-500 text-center">Exit</div>
+      </div>
       </div>;
     }
   }

@@ -46,6 +46,7 @@ class Level extends React.Component {
         currentLevel: nextLevel
       });
       this.props.history.push('/level/' + nextLevel);
+      localStorage.setItem('currentLevel', nextLevel);
     }
   
     render() {
