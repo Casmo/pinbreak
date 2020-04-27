@@ -34,7 +34,7 @@ class MainMenu extends React.Component {
           </Link>
           : ''
         }
-        <Link to="/level/1" className="block px-4 py-2 mb-2 bg-white text-center">Play</Link>
+        <Link to="/level/1" className="block px-4 py-2 mb-2 bg-white text-center">New Game</Link>
         <div onClick={window.close} className="cursor-pointer block px-4 py-2 mb-2 bg-gray-500 text-center">Exit</div>
       </div>
       </div>;

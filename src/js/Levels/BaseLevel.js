@@ -14,15 +14,15 @@ class BaseLevel extends React.Component {
   defaultGame = {
     level: 1,
     numberOfTries: 5,
+    world: {
+      gravity: {
+        x: 0,
+        y: 0
+      },
+    },
     settings: {
       width: 1080,
       height: 1920,
-      world: {
-        gravity: {
-          x: 0,
-          y: 0
-        }
-      },
       /**
        * Setting for the rock that will be throwned by the player
        */
@@ -97,8 +97,12 @@ class BaseLevel extends React.Component {
         // positionIterations: 20
         enableSleeping: true,
         world: Matter.World.create(
-          this.game.settings.world
+          this.game.world
         )
+      });
+
+      Matter.Events.on(this.game.engine, 'beforeUpdate', () => {
+        this.beforeUpdate();
       });
 
 
@@ -230,6 +234,13 @@ class BaseLevel extends React.Component {
             }
         }
       });
+    }
+
+    /**
+     * Game loop beforeUpdate
+     */
+    beforeUpdate() {
+
     }
 
     /**
