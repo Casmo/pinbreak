@@ -196,44 +196,56 @@ class BaseLevel extends React.Component {
         Matter.World.add(this.game.engine.world, this.game.goals[key].object);
       });
 
-      Matter.Events.on(this.game.engine, 'collisionStart', (event) => {
-        var pairs = event.pairs;
-
-        // change object colours to show those in an active collision (e.g. resting contact)
-        for (var i = 0; i < pairs.length; i++) {
-            var pair = pairs[i];
-            if (pair.bodyA._type == 'wall' || pair.bodyB._type == 'wall') {
-              continue;
-            }
-            if (pair.bodyA._type == 'player' || pair.bodyB._type == 'player') {
-              // Player always overrides the colors
-              pair.bodyA.render.fillStyle = '#ffffff';
-              pair.bodyB.render.fillStyle = '#ffffff';
-              pair.bodyA._overRule = false;
-              pair.bodyB._overRule = false;
-              pair.bodyA._complete = true;
-              pair.bodyB._complete = true;
-            }
-            else if (pair.bodyA._overRule == true || pair.bodyB._overRule == true) {
-              if (pair.bodyA._overRule == true) {
-                pair.bodyB.render.fillStyle = pair.bodyA.render.fillStyle;
-              }
-              else {
-                pair.bodyA.render.fillStyle = pair.bodyB.render.fillStyle;
-              }
-              pair.bodyA._overRule = true;
-              pair.bodyB._overRule = true;
-              pair.bodyA._complete = false;
-              pair.bodyB._complete = false;
-            }
-            else if (pair.bodyA._complete == true || pair.bodyB._complete == true) {
-              pair.bodyA.render.fillStyle = '#ffffff';
-              pair.bodyB.render.fillStyle = '#ffffff';
-              pair.bodyA._complete = true;
-              pair.bodyB._complete = true;
-            }
-        }
+      Matter.Events.on(this.game.engine, 'collisionActive', (event) => {
+        this.checkCollisions(event);
       });
+      Matter.Events.on(this.game.engine, 'collisionStart', (event) => {
+        this.checkCollisions(event);
+      });
+      Matter.Events.on(this.game.engine, 'collisionEnd', (event) => {
+        this.checkCollisions(event);
+      });
+    }
+
+    checkCollisions(event) {
+
+      var pairs = event.pairs;
+
+      // change object colours to show those in an active collision (e.g. resting contact)
+      for (var i = 0; i < pairs.length; i++) {
+          var pair = pairs[i];
+          if (pair.bodyA._type == 'wall' || pair.bodyB._type == 'wall') {
+            continue;
+          }
+          if (pair.bodyA._type == 'player' || pair.bodyB._type == 'player') {
+            // Player always overrides the colors
+            pair.bodyA.render.fillStyle = '#ffffff';
+            pair.bodyB.render.fillStyle = '#ffffff';
+            pair.bodyA._overRule = false;
+            pair.bodyB._overRule = false;
+            pair.bodyA._complete = true;
+            pair.bodyB._complete = true;
+          }
+          else if (pair.bodyA._overRule == true || pair.bodyB._overRule == true) {
+            if (pair.bodyA._overRule == true) {
+              pair.bodyB.render.fillStyle = pair.bodyA.render.fillStyle;
+            }
+            else {
+              pair.bodyA.render.fillStyle = pair.bodyB.render.fillStyle;
+            }
+            pair.bodyA._overRule = true;
+            pair.bodyB._overRule = true;
+            pair.bodyA._complete = false;
+            pair.bodyB._complete = false;
+          }
+          else if (pair.bodyA._complete == true || pair.bodyB._complete == true) {
+            pair.bodyA.render.fillStyle = '#ffffff';
+            pair.bodyB.render.fillStyle = '#ffffff';
+            pair.bodyA._complete = true;
+            pair.bodyB._complete = true;
+          }
+      }
+
     }
 
     /**
