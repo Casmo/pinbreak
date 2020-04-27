@@ -9,11 +9,11 @@ class Level6 extends BaseLevel {
     {
       _overRule: true,
       type: 'rectangle',
-      width: 1080,
-      height: 20,
+      width: 720,
+      height: 50,
       position: {
         x: 1080/2,
-        y: 60
+        y: 250
       },
       options: {
         isStatic: true,

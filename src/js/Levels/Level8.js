@@ -1,7 +1,7 @@
 import Matter from "matter-js";
 import BaseLevel from './BaseLevel';
 
-class Level7 extends BaseLevel {
+class Level8 extends BaseLevel {
 
   game = {
     world: {
@@ -148,4 +148,4 @@ class Level7 extends BaseLevel {
     }
 
   }
-  export default Level7;
+  export default Level8;

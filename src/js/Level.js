@@ -11,6 +11,7 @@ import Level5 from "./Levels/Level5";
 import Level6 from "./Levels/Level6";
 import Level7 from "./Levels/Level7";
 import Level8 from "./Levels/Level8";
+import Level9 from "./Levels/Level9";
 import Credits from "./Levels/Credits";
 
 class Level extends React.Component {
@@ -75,6 +76,9 @@ class Level extends React.Component {
       }
       else if (this.state.currentLevel == 8) {
         level = <Level8 nextLevel = {this.nextLevel} />;
+      }
+      else if (this.state.currentLevel == 9) {
+        level = <Level9 nextLevel = {this.nextLevel} />;
       }
       else {
         level = <Credits />
