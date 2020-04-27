@@ -205,20 +205,22 @@ class BaseLevel extends React.Component {
               // Player always overrides the colors
               pair.bodyA.render.fillStyle = '#ffffff';
               pair.bodyB.render.fillStyle = '#ffffff';
+              pair.bodyA._overRule = false;
+              pair.bodyB._overRule = false;
               pair.bodyA._complete = true;
               pair.bodyB._complete = true;
             }
             else if (pair.bodyA._overRule == true || pair.bodyB._overRule == true) {
               if (pair.bodyA._overRule == true) {
-                pair.bodyB._overRule = true;
                 pair.bodyB.render.fillStyle = pair.bodyA.render.fillStyle;
-                pair.bodyB._complete = false;
               }
               else {
                 pair.bodyA.render.fillStyle = pair.bodyB.render.fillStyle;
-                pair.bodyA._complete = false;
-                pair.bodyA._overRule = true;
               }
+              pair.bodyA._overRule = true;
+              pair.bodyB._overRule = true;
+              pair.bodyA._complete = false;
+              pair.bodyB._complete = false;
             }
             else if (pair.bodyA._complete == true || pair.bodyB._completed == true) {
               pair.bodyA.render.fillStyle = '#ffffff';
@@ -294,22 +296,28 @@ class BaseLevel extends React.Component {
             this.game.rock.position.y < (this.game.settings.player.position.y-20))
             ) {
               let numberOfTries = this.state.numberOfTries;
-              numberOfTries--;
-              this.setState({
-                numberOfTries: numberOfTries
-              });
-              this.game.rock.collisionFilter.category = 0x001;
-
-
-
-              Matter.Events.on(this.game.rock, 'sleepStart', (event) => {
-                // When a rock ends, it becomes a goal
-                event.source._type = 'goal';
-                event.source.render.lineWidth = 0;
-                event.source._complete = true;
-              });
               
               if (numberOfTries > 0) {
+
+                numberOfTries--;
+                this.setState({
+                  numberOfTries: numberOfTries
+                });
+                this.game.rock.collisionFilter.category = 0x001;
+  
+  
+  
+                Matter.Events.on(this.game.rock, 'sleepStart', (event) => {
+                  // When a rock ends, it becomes a goal
+                  event.source._type = 'goal';
+                  event.source.render.lineWidth = 0;
+                  event.source._complete = true;
+                  this.game.goals.push({
+                    object: event.source
+                  });
+                  this.checkEndGameConditions();
+                });
+
                   // Remove group from previous (the shooting) rock
                 this.game.rock = Matter.Bodies.circle(
                   this.game.settings.player.position.x,
@@ -364,7 +372,7 @@ class BaseLevel extends React.Component {
         {winningMessage}
         <div className="flex items-center justify-center h-screen w-screen" ref="scene">
           <canvas ref="canvas" className="object-contain w-auto h-auto max-h-screen max-w-screen" />
-          <div className="text-white absolute top-0">Shots left: {this.state.numberOfTries}</div>
+          <div className="text-white absolute top-0 mt-2">Shots left: {this.state.numberOfTries}</div>
         </div>
       </div>;
     }

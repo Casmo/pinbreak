@@ -5,7 +5,6 @@ import BaseLevel from './BaseLevel';
 class Level5 extends BaseLevel {
 
   game = {
-    numberOfTries: 10,
     goals: [
     {
       _overRule: true,

@@ -9,7 +9,7 @@ class Level2 extends BaseLevel {
     {
       object: null,
       position: {
-        x: (1080/2) + 400,
+        x: (1080/2) + 300,
         y: 200
       },
       options: {
