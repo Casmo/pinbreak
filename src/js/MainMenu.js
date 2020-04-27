@@ -29,7 +29,7 @@ class MainMenu extends React.Component {
         {this.state.currentLevel > 1 ?
           <Link to={{
             pathname: '/level/' + this.state.currentLevel
-          }} className="block px-4 py-2 mb-2 bg-red-500 text-center">
+          }} className="block px-4 py-2 mb-2 bg-green-500 text-center">
             Continue
           </Link>
           : ''

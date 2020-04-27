@@ -222,7 +222,7 @@ class BaseLevel extends React.Component {
               pair.bodyA._complete = false;
               pair.bodyB._complete = false;
             }
-            else if (pair.bodyA._complete == true || pair.bodyB._completed == true) {
+            else if (pair.bodyA._complete == true || pair.bodyB._complete == true) {
               pair.bodyA.render.fillStyle = '#ffffff';
               pair.bodyB.render.fillStyle = '#ffffff';
               pair.bodyA._complete = true;
