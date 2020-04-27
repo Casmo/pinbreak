@@ -9,28 +9,10 @@ class Level2 extends BaseLevel {
     {
       object: null,
       position: {
-        x: 1080/2,
-        y: 500
+        x: (1080/2) + 400,
+        y: 200
       },
       options: {
-        density: 0.1,
-        restitution: .8,
-        isStatic: false,
-        // frictionAir: 1,
-        render: {
-          fillStyle: 'red'
-        }
-      }
-    },
-    {
-      object: null,
-      position: {
-        x: 1080/2,
-        y: 300
-      },
-      options: {
-        density: 0.1,
-        restitution: .8,
         isStatic: false,
         // frictionAir: 1,
         render: {
@@ -39,6 +21,28 @@ class Level2 extends BaseLevel {
       }
     }
   ]
+    }
+
+    start() {
+
+      var firstWall = Matter.Bodies.rectangle(this.game.settings.width / 2, 600, 500, 20, {
+        isStatic: true,
+        angle: -.9,
+        render: {
+          visible: true,
+          fillStyle: '#ffffff'
+        }
+      });
+
+      var secondWall = Matter.Bodies.rectangle((this.game.settings.width / 2) + 250, 700, 500, 20, {
+        isStatic: true,
+        angle: -.9,
+        render: {
+          visible: true,
+          fillStyle: '#ffffff'
+        }
+      });
+      Matter.World.add(this.game.engine.world, [firstWall, secondWall]);
     }
 
   }

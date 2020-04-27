@@ -27,12 +27,12 @@ class BaseLevel extends React.Component {
        * Setting for the rock that will be throwned by the player
        */
       rock: {
-        density: 0.1,
-        restitution: .8,
         collisionFilter: {
             category: 0x0002
         },
         render: {
+            lineWidth: 10,
+            strokeStyle: '#ff9900',
             fillStyle: '#ffffff'
         }
       },
@@ -62,8 +62,6 @@ class BaseLevel extends React.Component {
           y: 400
         },
         options: {
-          density: 0.1,
-          restitution: .8,
           isStatic: false,
           // frictionAir: 1,
           render: {
@@ -118,30 +116,38 @@ class BaseLevel extends React.Component {
       });
       
       // Add walls & floors
-      var floor = Matter.Bodies.rectangle(this.game.settings.width / 2, this.game.settings.height + 40, this.game.settings.width, 80, {
+      var floor = Matter.Bodies.rectangle(this.game.settings.width / 2, this.game.settings.height + 40, this.game.settings.width, 90, {
         isStatic: true,
         render: {
-          visible: false
+          fillStyle: '#ffffff',
+          visible: true
         }
       });
-      var ceiling = Matter.Bodies.rectangle(this.game.settings.width / 2, -40, this.game.settings.width, 80, {
+      var ceiling = Matter.Bodies.rectangle(this.game.settings.width / 2, -40, this.game.settings.width, 90, {
         isStatic: true,
         render: {
-          visible: false
+          fillStyle: '#ffffff',
+          visible: true
         }
       });
-      var wallLeft = Matter.Bodies.rectangle(-40, this.game.settings.height / 2, 80, this.game.settings.height, {
+      var wallLeft = Matter.Bodies.rectangle(-40, this.game.settings.height / 2, 90, this.game.settings.height, {
         isStatic: true,
         render: {
-          visible: false
+          fillStyle: '#ffffff',
+          visible: true
         }
       });
-      var wallRight = Matter.Bodies.rectangle(this.game.settings.width+40, this.game.settings.height / 2, 80, this.game.settings.height, {
+      var wallRight = Matter.Bodies.rectangle(this.game.settings.width+40, this.game.settings.height / 2, 90, this.game.settings.height, {
         isStatic: true,
         render: {
-          visible: false
+          fillStyle: '#ffffff',
+          visible: true
         }
       });
+      ceiling._type = 'wall';
+      floor._type = 'wall';
+      wallLeft._type = 'wall';
+      wallRight._type = 'wall'; // Should use label?
       Matter.World.add(this.game.engine.world, ceiling);
       Matter.World.add(this.game.engine.world, floor);
       Matter.World.add(this.game.engine.world, wallLeft);
@@ -156,12 +162,25 @@ class BaseLevel extends React.Component {
 
       // Create objectives
       this.game.goals.map((goal, key) => {
-        this.game.goals[key].object = Matter.Bodies.circle(
-          goal.position.x,
-          goal.position.y,
-          40,
-          goal.options
-        );
+        if (goal.type == 'rectangle') {
+          this.game.goals[key].object = Matter.Bodies.rectangle(
+            goal.position.x,
+            goal.position.y,
+            goal.width,
+            goal.height,
+            goal.options
+          );
+        }
+        else {
+          this.game.goals[key].object = Matter.Bodies.circle(
+            goal.position.x,
+            goal.position.y,
+            40,
+            goal.options
+          );
+        }
+        this.game.goals[key].object._type = 'goals';
+        this.game.goals[key].object._overRule = goal._overRule;
       
         Matter.Events.on(this.game.goals[key].object, 'sleepStart', (event) => {
           // Check endgame conditions
@@ -177,12 +196,25 @@ class BaseLevel extends React.Component {
         // change object colours to show those in an active collision (e.g. resting contact)
         for (var i = 0; i < pairs.length; i++) {
             var pair = pairs[i];
+            if (pair.bodyA._type == 'wall' || pair.bodyB._type == 'wall') {
+              continue;
+            }
             if (pair.bodyA._type == 'player' || pair.bodyB._type == 'player') {
               // Player always overrides the colors
               pair.bodyA.render.fillStyle = '#ffffff';
               pair.bodyB.render.fillStyle = '#ffffff';
               pair.bodyA._complete = true;
               pair.bodyB._complete = true;
+            }
+            else if (pair.bodyA._overRule == true || pair.bodyB._overRule == true) {
+              if (pair.bodyA._overRule == true) {
+                pair.bodyB.render.fillStyle = pair.bodyA.render.fillStyle;
+                pair.bodyB._complete = false;
+              }
+              else {
+                pair.bodyA.render.fillStyle = pair.bodyB.render.fillStyle;
+                pair.bodyA._complete = false;
+              }
             }
             else if (pair.bodyA._complete == true || pair.bodyB._completed == true) {
               pair.bodyA.render.fillStyle = '#ffffff';

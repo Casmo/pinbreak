@@ -5,6 +5,9 @@ import {
 
 import Level1 from "./Levels/Level1";
 import Level2 from "./Levels/Level2";
+import Level3 from "./Levels/Level3";
+import Level4 from "./Levels/Level4";
+import Level5 from "./Levels/Level5";
 import Credits from "./Levels/Credits";
 
 class Level extends React.Component {
@@ -41,6 +44,7 @@ class Level extends React.Component {
       this.setState({
         currentLevel: nextLevel
       });
+      this.props.history.push('/level/' + nextLevel);
     }
   
     render() {
@@ -50,6 +54,15 @@ class Level extends React.Component {
       }
       else if (this.state.currentLevel == 2) {
         level = <Level2 nextLevel = {this.nextLevel} />;
+      }
+      else if (this.state.currentLevel == 3) {
+        level = <Level3 nextLevel = {this.nextLevel} />;
+      }
+      else if (this.state.currentLevel == 4) {
+        level = <Level4 nextLevel = {this.nextLevel} />;
+      }
+      else if (this.state.currentLevel == 5) {
+        level = <Level5 nextLevel = {this.nextLevel} />;
       }
       else {
         level = <Credits />
