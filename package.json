@@ -48,7 +48,7 @@
     "url-loader": "^4.0.0",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3",
+    "webpack-dev-server": "^5.2.2",
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
@@ -58,6 +58,6 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "^3.4.1"
+    "react-scripts": "^5.0.1"
   }
 }
